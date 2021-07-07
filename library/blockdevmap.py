@@ -360,12 +360,12 @@ class cBlockDevMap(object):
 
         # Get the partition table type.  Useful to know in case we are checking whether this block device is partition-less.  Cannot use the PTTYPE option to lsblk above, as it is not supported in earlier versions of lsblk (e.g. CentOS7)
         for os_device in os_device_names:
-            udevadm_output_lines = subprocess.check_output(['udevadm', 'info', '--query=property', '--name', os_device['NAME']]).decode().rstrip().split('\n')
-            udevadm_output = dict(s.split('=',1) for s in udevadm_output_lines)
-            if 'ID_PART_TABLE_TYPE' in udevadm_output:
-                os_device.update({"parttable_type": udevadm_output['ID_PART_TABLE_TYPE']})
-            else:
-                os_device.update({"parttable_type": ""})
+            os_device.update({"parttable_type": ""})
+            if os_device['TYPE'] not in ['lvm']:
+                udevadm_output_lines = subprocess.check_output(['udevadm', 'info', '--query=property', '--name', os_device['NAME']]).decode().rstrip().split('\n')
+                udevadm_output = dict(s.split('=',1) for s in udevadm_output_lines)
+                if 'ID_PART_TABLE_TYPE' in udevadm_output:
+                    os_device.update({"parttable_type": udevadm_output['ID_PART_TABLE_TYPE']})
         return os_device_names
 
 
