@@ -1,0 +1,32 @@
+namespace: dseeley
+
+name: blockdevmap
+
+version: 1.0.0
+
+readme: README.md
+
+authors:
+- Dougal Seeley <git@dougalseeley.com>
+
+description: An Ansible module to map cloud-specific (AWS, GCP and Azure) device names to the real host device names.
+
+#license:
+#- BSD-3-Clause
+
+license_file: 'LICENSE'
+
+tags: ['aws', 'gcp', 'azure', 'storage', 'system']
+
+dependencies: {}
+
+repository: https://github.com/dseeley/blockdevmap
+
+documentation: https://github.com/dseeley/blockdevmap/blob/master/README.md
+
+homepage: https://github.com/dseeley/blockdevmap
+
+issues: https://github.com/dseeley/blockdevmap/issues
+
+build_ignore: [ '.idea', '.gitignore']
+

@@ -1,4 +1,4 @@
-# Copyright 2020 Dougal Seeley <github@dougalseeley.com>
+# Copyright 2022 Dougal Seeley <github@dougalseeley.com>
 # BSD 3-Clause License
 # https://github.com/dseeley/blockdevmap
 
