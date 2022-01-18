@@ -1,6 +1,6 @@
 # Ansible Collection - dseeley.blockdevmap
 
-An Ansible plugin (or python script) that is able to map cloud-specific (AWS, GCP and Azure) device names to the host device names.  It returns a list of dictionaries (per disk), derived from Linux `lsblk`, augmented (in the case of AWS & Azure) with disk information from other machine metadata.
+An Ansible module (or python script) to map cloud-specific (AWS, GCP and Azure) block device names (e.g. /dev/sdf) with the volume provided to the OS.
 
 
 ## Output

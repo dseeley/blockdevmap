@@ -9,7 +9,7 @@ readme: README.md
 authors:
 - Dougal Seeley <github@dougalseeley.com>
 
-description: An Ansible plugin to map cloud-specific (AWS, GCP and Azure) device names to the real host device names.
+description: An Ansible module to map cloud-specific (AWS, GCP and Azure) block device names (e.g. /dev/sdf) with the volume provided to the OS.
 
 #license:
 #- BSD-3-Clause
