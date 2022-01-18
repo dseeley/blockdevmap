@@ -1,0 +1,7 @@
+#!groovy
+
+node {
+    stage('Call blockdevmap/blockdevmap-release-tag') {
+        build job: 'blockdevmap/blockdevmap-release-tag', parameters: [string(name: 'NEW_VERSION', value: "next")]
+    }
+}

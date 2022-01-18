@@ -2,14 +2,14 @@ namespace: dseeley
 
 name: blockdevmap
 
-version: 1.0.0
+version: AUTOFILLED_BY_JENKINS
 
 readme: README.md
 
 authors:
-- Dougal Seeley <git@dougalseeley.com>
+- Dougal Seeley <github@dougalseeley.com>
 
-description: An Ansible module to map cloud-specific (AWS, GCP and Azure) device names to the real host device names.
+description: An Ansible plugin to map cloud-specific (AWS, GCP and Azure) device names to the real host device names.
 
 #license:
 #- BSD-3-Clause
@@ -28,5 +28,5 @@ homepage: https://github.com/dseeley/blockdevmap
 
 issues: https://github.com/dseeley/blockdevmap/issues
 
-build_ignore: [ '.idea', '.gitignore']
+build_ignore: [ '.idea', '.gitignore' ]
 
