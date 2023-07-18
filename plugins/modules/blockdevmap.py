@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright 2022 Dougal Seeley <github@dougalseeley.com>
 # BSD 3-Clause License
 # https://github.com/dseeley/blockdevmap
@@ -8,23 +10,25 @@
 # the License.
 # /sbin/ebsnvme-id - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html
 
-from __future__ import (absolute_import, division, print_function)
-
+from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: blockdevmap
 version_added: 1.0.0
-short_description: blockdevmap
+short_description: Map the block device names from cloud providers to the OS.
 description:
-    - Map the block device name as defined in AWS/GCP/Azure (e.g. /dev/sdf) with the volume provided to the OS
+    - This Ansible module maps the block device names as defined in AWS, GCP, Azure, and libvirt (e.g. /dev/sdf) with the corresponding volumes provided to the OS.
 authors:
     - Dougal Seeley <blockdevmap@dougalseeley.com>
-    - Amazon.com Inc.
+    - Amazon.com Inc. <https://aws.amazon.com>
+license:
+    - BSD 3-Clause License <https://opensource.org/licenses/BSD-3-Clause>
+    - MIT License <https://opensource.org/licenses/MIT>
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Get block device map information for cloud provider
   blockdevmap:
     cloud_type: <gcp|aws|azure|libvirt>
@@ -41,200 +45,208 @@ EXAMPLES = '''
   debug: msg={{r__blockdevmap}}
 '''
 
-RETURN = '''
+RETURN = r'''
 ## AWS Nitro
-"device_map": [
-    {
-        "FSTYPE": "ext4",
-        "MOUNTPOINT": "/media/mysvc",
-        "NAME": "nvme1n1",
-        "PARTLABEL": "",
-        "SERIAL": "vol0c2c47ee4516063e9",
-        "TYPE": "disk",
-        "UUID": "c3630dbe-042e-44e5-ac67-54fa1c9e4cd2",
-        "device_name_cloud": "/dev/sdf",
-        "device_name_os": "/dev/nvme1n1",
-        "volume_id": "vol-0c2c47ee4516063e9"
-    },
-    {
-        "FSTYPE": "",
-        "MOUNTPOINT": "",
-        "NAME": "nvme0n1",
-        "PARTLABEL": "",
-        "SERIAL": "vol0b05e48d5677db81a",
-        "TYPE": "disk",
-        "UUID": "",
-        "device_name_cloud": "/dev/sda1",
-        "device_name_os": "/dev/nvme0n1",
-        "volume_id": "vol-0b05e48d5677db81a"
-    },
-    {
-        "FSTYPE": "ext4",
-        "MOUNTPOINT": "/",
-        "NAME": "nvme0n1p1",
-        "PARTLABEL": "",
-        "SERIAL": "",
-        "TYPE": "part",
-        "UUID": "96ec7adb-9d94-41c0-96a5-d6992c9d5f20",
-        "device_name_cloud": "/dev/sda1",
-        "device_name_os": "/dev/nvme0n1p1",
-        "volume_id": "vol-0b05e48d5677db81a"
-    }
-    
-## AWS non-Nitro
-"device_map": [
-    {
-        "FSTYPE": "",
-        "MOUNTPOINT": "",
-        "NAME": "xvda",
-        "PARTLABEL": "",
-        "SERIAL": "",
-        "TYPE": "disk",
-        "UUID": "",
-        "device_name_cloud": "/dev/sda",
-        "device_name_os": "/dev/xvda"
-    },
-    {
-        "FSTYPE": "ext4",
-        "MOUNTPOINT": "/",
-        "NAME": "xvda1",
-        "PARTLABEL": "",
-        "SERIAL": "",
-        "TYPE": "part",
-        "UUID": "96ec7adb-9d94-41c0-96a5-d6992c9d5f20",
-        "device_name_cloud": "/dev/sda1",
-        "device_name_os": "/dev/xvda1"
-    }
+{
+    "device_map": [
+        {
+            "FSTYPE": "ext4",
+            "MOUNTPOINT": "/media/mysvc",
+            "NAME": "nvme1n1",
+            "PARTLABEL": "",
+            "SERIAL": "vol0c2c47ee4516063e9",
+            "TYPE": "disk",
+            "UUID": "c3630dbe-042e-44e5-ac67-54fa1c9e4cd2",
+            "device_name_cloud": "/dev/sdf",
+            "device_name_os": "/dev/nvme1n1",
+            "volume_id": "vol-0c2c47ee4516063e9"
+        },
+        {
+            "FSTYPE": "",
+            "MOUNTPOINT": "",
+            "NAME": "nvme0n1",
+            "PARTLABEL": "",
+            "SERIAL": "vol0b05e48d5677db81a",
+            "TYPE": "disk",
+            "UUID": "",
+            "device_name_cloud": "/dev/sda1",
+            "device_name_os": "/dev/nvme0n1",
+            "volume_id": "vol-0b05e48d5677db81a"
+        },
+        {
+            "FSTYPE": "ext4",
+            "MOUNTPOINT": "/",
+            "NAME": "nvme0n1p1",
+            "PARTLABEL": "",
+            "SERIAL": "",
+            "TYPE": "part",
+            "UUID": "96ec7adb-9d94-41c0-96a5-d6992c9d5f20",
+            "device_name_cloud": "/dev/sda1",
+            "device_name_os": "/dev/nvme0n1p1",
+            "volume_id": "vol-0b05e48d5677db81a"
+        }
+    ]
+}
 
-## AZURE    
-"device_map": [
-    {
-        "FSTYPE": "",
-        "HCTL": "0:0:0:0",
-        "MODEL": "Virtual Disk",
-        "MOUNTPOINT": "",
-        "NAME": "sda",
-        "SERIAL": "6002248071748569390b23178109d35e",
-        "SIZE": "32212254720",
-        "TYPE": "disk",
-        "UUID": "",
-        "device_name_cloud": "ROOTDISK",
-        "device_name_os": "/dev/sda",
-        "parttable_type": "gpt"
-    },
-    {
-        "FSTYPE": "xfs",
-        "HCTL": "",
-        "MODEL": "",
-        "MOUNTPOINT": "/boot",
-        "NAME": "sda1",
-        "SERIAL": "",
-        "SIZE": "524288000",
-        "TYPE": "part",
-        "UUID": "8bd4ad1d-13a7-4bb1-a40c-b05444f11db3",
-        "device_name_cloud": "",
-        "device_name_os": "/dev/sda1",
-        "parttable_type": "gpt"
-    },
-    {
-        "FSTYPE": "",
-        "HCTL": "",
-        "MODEL": "",
-        "MOUNTPOINT": "",
-        "NAME": "sda14",
-        "SERIAL": "",
-        "SIZE": "4194304",
-        "TYPE": "part",
-        "UUID": "",
-        "device_name_cloud": "",
-        "device_name_os": "/dev/sda14",
-        "parttable_type": "gpt"
-    },
-    {
-        "FSTYPE": "vfat",
-        "HCTL": "",
-        "MODEL": "",
-        "MOUNTPOINT": "/boot/efi",
-        "NAME": "sda15",
-        "SERIAL": "",
-        "SIZE": "519045632",
-        "TYPE": "part",
-        "UUID": "F5EB-013D",
-        "device_name_cloud": "",
-        "device_name_os": "/dev/sda15",
-        "parttable_type": "gpt"
-    },
-    {
-        "FSTYPE": "xfs",
-        "HCTL": "",
-        "MODEL": "",
-        "MOUNTPOINT": "/",
-        "NAME": "sda2",
-        "SERIAL": "",
-        "SIZE": "31161581568",
-        "TYPE": "part",
-        "UUID": "40a878b6-3fe8-4336-820a-951a19f79a76",
-        "device_name_cloud": "",
-        "device_name_os": "/dev/sda2",
-        "parttable_type": "gpt"
-    },
-    {
-        "FSTYPE": "",
-        "HCTL": "0:0:0:1",
-        "MODEL": "Virtual Disk",
-        "MOUNTPOINT": "",
-        "NAME": "sdb",
-        "SERIAL": "60022480c891da018bdd14b5dd1895b0",
-        "SIZE": "4294967296",
-        "TYPE": "disk",
-        "UUID": "",
-        "device_name_cloud": "RESOURCEDISK",
-        "device_name_os": "/dev/sdb",
-        "parttable_type": "dos"
-    },
-    {
-        "FSTYPE": "ext4",
-        "HCTL": "",
-        "MODEL": "",
-        "MOUNTPOINT": "/mnt/resource",
-        "NAME": "sdb1",
-        "SERIAL": "",
-        "SIZE": "4292870144",
-        "TYPE": "part",
-        "UUID": "95192b50-0c76-4a03-99a7-67fdc225504f",
-        "device_name_cloud": "",
-        "device_name_os": "/dev/sdb1",
-        "parttable_type": "dos"
-    },
-    {
-        "FSTYPE": "",
-        "HCTL": "1:0:0:0",
-        "MODEL": "Virtual Disk",
-        "MOUNTPOINT": "",
-        "NAME": "sdc",
-        "SERIAL": "60022480b71fde48d1f2212130abc54e",
-        "SIZE": "1073741824",
-        "TYPE": "disk",
-        "UUID": "",
-        "device_name_cloud": "0",
-        "device_name_os": "/dev/sdc",
-        "parttable_type": ""
-    },
-    {
-        "FSTYPE": "",
-        "HCTL": "1:0:0:1",
-        "MODEL": "Virtual Disk",
-        "MOUNTPOINT": "",
-        "NAME": "sdd",
-        "SERIAL": "60022480aa9c0d340c125a5295ee678d",
-        "SIZE": "1073741824",
-        "TYPE": "disk",
-        "UUID": "",
-        "device_name_cloud": "1",
-        "device_name_os": "/dev/sdd",
-        "parttable_type": ""
-    }
-]
+## AWS non-Nitro
+{
+    "device_map": [
+        {
+            "FSTYPE": "",
+            "MOUNTPOINT": "",
+            "NAME": "xvda",
+            "PARTLABEL": "",
+            "SERIAL": "",
+            "TYPE": "disk",
+            "UUID": "",
+            "device_name_cloud": "/dev/sda",
+            "device_name_os": "/dev/xvda"
+        },
+        {
+            "FSTYPE": "ext4",
+            "MOUNTPOINT": "/",
+            "NAME": "xvda1",
+            "PARTLABEL": "",
+            "SERIAL": "",
+            "TYPE": "part",
+            "UUID": "96ec7adb-9d94-41c0-96a5-d6992c9d5f20",
+            "device_name_cloud": "/dev/sda1",
+            "device_name_os": "/dev/xvda1"
+        }
+    ]
+}
+
+## AZURE
+{
+    "device_map": [
+        {
+            "FSTYPE": "",
+            "HCTL": "0:0:0:0",
+            "MODEL": "Virtual Disk",
+            "MOUNTPOINT": "",
+            "NAME": "sda",
+            "SERIAL": "6002248071748569390b23178109d35e",
+            "SIZE": "32212254720",
+            "TYPE": "disk",
+            "UUID": "",
+            "device_name_cloud": "ROOTDISK",
+            "device_name_os": "/dev/sda",
+            "parttable_type": "gpt"
+        },
+        {
+            "FSTYPE": "xfs",
+            "HCTL": "",
+            "MODEL": "",
+            "MOUNTPOINT": "/boot",
+            "NAME": "sda1",
+            "SERIAL": "",
+            "SIZE": "524288000",
+            "TYPE": "part",
+            "UUID": "8bd4ad1d-13a7-4bb1-a40c-b05444f11db3",
+            "device_name_cloud": "",
+            "device_name_os": "/dev/sda1",
+            "parttable_type": "gpt"
+        },
+        {
+            "FSTYPE": "",
+            "HCTL": "",
+            "MODEL": "",
+            "MOUNTPOINT": "",
+            "NAME": "sda14",
+            "SERIAL": "",
+            "SIZE": "4194304",
+            "TYPE": "part",
+            "UUID": "",
+            "device_name_cloud": "",
+            "device_name_os": "/dev/sda14",
+            "parttable_type": "gpt"
+        },
+        {
+            "FSTYPE": "vfat",
+            "HCTL": "",
+            "MODEL": "",
+            "MOUNTPOINT": "/boot/efi",
+            "NAME": "sda15",
+            "SERIAL": "",
+            "SIZE": "519045632",
+            "TYPE": "part",
+            "UUID": "F5EB-013D",
+            "device_name_cloud": "",
+            "device_name_os": "/dev/sda15",
+            "parttable_type": "gpt"
+        },
+        {
+            "FSTYPE": "xfs",
+            "HCTL": "",
+            "MODEL": "",
+            "MOUNTPOINT": "/",
+            "NAME": "sda2",
+            "SERIAL": "",
+            "SIZE": "31161581568",
+            "TYPE": "part",
+            "UUID": "40a878b6-3fe8-4336-820a-951a19f79a76",
+            "device_name_cloud": "",
+            "device_name_os": "/dev/sda2",
+            "parttable_type": "gpt"
+        },
+        {
+            "FSTYPE": "",
+            "HCTL": "0:0:0:1",
+            "MODEL": "Virtual Disk",
+            "MOUNTPOINT": "",
+            "NAME": "sdb",
+            "SERIAL": "60022480c891da018bdd14b5dd1895b0",
+            "SIZE": "4294967296",
+            "TYPE": "disk",
+            "UUID": "",
+            "device_name_cloud": "RESOURCEDISK",
+            "device_name_os": "/dev/sdb",
+            "parttable_type": "dos"
+        },
+        {
+            "FSTYPE": "ext4",
+            "HCTL": "",
+            "MODEL": "",
+            "MOUNTPOINT": "/mnt/resource",
+            "NAME": "sdb1",
+            "SERIAL": "",
+            "SIZE": "4292870144",
+            "TYPE": "part",
+            "UUID": "95192b50-0c76-4a03-99a7-67fdc225504f",
+            "device_name_cloud": "",
+            "device_name_os": "/dev/sdb1",
+            "parttable_type": "dos"
+        },
+        {
+            "FSTYPE": "",
+            "HCTL": "1:0:0:0",
+            "MODEL": "Virtual Disk",
+            "MOUNTPOINT": "",
+            "NAME": "sdc",
+            "SERIAL": "60022480b71fde48d1f2212130abc54e",
+            "SIZE": "1073741824",
+            "TYPE": "disk",
+            "UUID": "",
+            "device_name_cloud": "0",
+            "device_name_os": "/dev/sdc",
+            "parttable_type": ""
+        },
+        {
+            "FSTYPE": "",
+            "HCTL": "1:0:0:1",
+            "MODEL": "Virtual Disk",
+            "MOUNTPOINT": "",
+            "NAME": "sdd",
+            "SERIAL": "60022480aa9c0d340c125a5295ee678d",
+            "SIZE": "1073741824",
+            "TYPE": "disk",
+            "UUID": "",
+            "device_name_cloud": "1",
+            "device_name_os": "/dev/sdd",
+            "parttable_type": ""
+        }
+    ]
+}
 '''
 
 from ctypes import *
@@ -440,13 +452,13 @@ class cAwsMapper(cBlockDevMap):
                     dev = cAwsMapper.ebs_nvme_device(os_device['device_name_os'])
                 except FileNotFoundError as e:
                     self.module.fail_json(msg=os_device['device_name_os'] + ": FileNotFoundError" + str(e))
-                except TypeError as e:
+                except TypeError:
                     if instance_store_count < len(instance_store_map):
                         os_device.update({"device_name_os": os_device['device_name_os'], "device_name_cloud": '/dev/' + instance_store_map[instance_store_count]['ephemeral_map'], "volume_id": instance_store_map[instance_store_count]['ephemeral_id']})
                         instance_store_count += 1
                     else:
                         self.module.warn(u"%s is not an EBS device and there is no instance store mapping." % os_device['device_name_os'])
-                except OSError as e:
+                except OSError:
                     self.module.warn(u"%s is not an nvme device." % os_device['device_name_os'])
                 else:
                     os_device.update({"device_name_os": os_device['device_name_os'], "device_name_cloud": '/dev/' + dev.get_block_device(stripped=True).rstrip(), "volume_id": dev.get_volume_id()})
@@ -455,7 +467,7 @@ class cAwsMapper(cBlockDevMap):
             else:
                 os_device.update({"device_name_os": os_device['device_name_os'], "device_name_cloud": ""})
 
-    class ebs_nvme_device():
+    class ebs_nvme_device:
         def __init__(self, device):
             self.device = device
             self.ctrl_identify()
@@ -488,7 +500,7 @@ def main():
     if not (len(sys.argv) > 1 and sys.argv[1] == "console"):
         module = AnsibleModule(argument_spec={"cloud_type": {"type": "str", "required": True, "choices": ['aws', 'gcp', 'azure', 'libvirt', 'lsblk']}}, supports_check_mode=True)
     else:
-        class cDummyAnsibleModule():  # For testing without Ansible (e.g on Windows)
+        class cDummyAnsibleModule:  # For testing without Ansible (e.g. on Windows)
             def __init__(self):
                 self.params = {}
 
