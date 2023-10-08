@@ -9,14 +9,14 @@ readme: README.md
 authors:
 - Dougal Seeley <github@dougalseeley.com>
 
-description: An Ansible module to map cloud-specific (AWS, GCP and Azure) block device names (e.g. /dev/sdf) with the volume provided to the OS.
+description: An Ansible module to map cloud-specific (AWS, GCP, Azure, LibVirt) block device names (e.g. /dev/sdf) with the volume provided to the OS.
 
 #license:
 #- BSD-3-Clause
 
 license_file: 'LICENSE'
 
-tags: ['aws', 'gcp', 'azure', 'storage', 'system']
+tags: ['aws', 'gcp', 'azure', 'libvirt', 'storage', 'system']
 
 dependencies: {}
 

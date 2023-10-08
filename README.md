@@ -1,7 +1,6 @@
 # Ansible Collection - dseeley.blockdevmap
 
-An Ansible module (or python script) to map cloud-specific (AWS, GCP and Azure) block device names (e.g. /dev/sdf) with the volume provided to the OS.
-
+An Ansible module to map cloud-specific (AWS, GCP, Azure, LibVirt) block device names (e.g. /dev/sdf) with the volume provided to the OS.
 
 ## Output
 ### Common
@@ -31,13 +30,13 @@ This can be run as an Ansible module (needs root):
 - name: Get block device map information for cloud
   blockdevmap:
     cloud_type: <gcp|aws|azure>
-  become: yes
+  become: true
   register: r__blockdevmap
 
 - name: Get lsblk device map information
   blockdevmap:
     cloud_type: lsblk
-  become: yes
+  become: true
   register: r__blockdevmap
 
 - name: debug blockdevmap

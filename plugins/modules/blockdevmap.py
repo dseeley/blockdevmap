@@ -31,13 +31,13 @@ EXAMPLES = r'''
 - name: Get block device map information for cloud provider
   blockdevmap:
     cloud_type: <gcp|aws|azure|libvirt>
-  become: yes
+  become: true
   register: r__blockdevmap
 
 - name: Get lsblk device map information
   blockdevmap:
     cloud_type: lsblk
-  become: yes
+  become: true
   register: r__blockdevmap
 
 - name: debug blockdevmap
