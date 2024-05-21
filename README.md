@@ -45,5 +45,5 @@ This can be run as an Ansible module (needs root):
 
 or from the console:
 ```bash
-python3 ./blockdevmap.py console
+python3 ./blockdevmap.py console aws
 ```
