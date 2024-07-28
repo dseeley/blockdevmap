@@ -2,7 +2,7 @@ namespace: dseeley
 
 name: blockdevmap
 
-version: AUTOFILLED_BY_JENKINS
+version: 0.0.0       # This is automatically filled by Jenkins on galaxy release with the current git release tag number.
 
 readme: README.md
 
@@ -28,5 +28,5 @@ homepage: https://github.com/dseeley/blockdevmap
 
 issues: https://github.com/dseeley/blockdevmap/issues
 
-build_ignore: [ '.idea', '.gitignore' ]
+build_ignore: [ '.idea', '.gitignore', 'Dockerfile*' ]
 
