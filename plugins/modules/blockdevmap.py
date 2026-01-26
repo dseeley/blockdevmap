@@ -261,8 +261,6 @@ import re
 
 try:
     from ansible.module_utils.basic import AnsibleModule
-    from ansible.errors import AnsibleError
-    from ansible.utils.display import Display
 except:
     pass
 
