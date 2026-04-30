@@ -283,6 +283,7 @@ AMZN_NVME_EBS_MN = "Amazon Elastic Block Store"
 
 class nvme_admin_command(Structure):
     _pack_ = 1
+    _layout_ = 'ms'
     _fields_ = [("opcode", c_uint8),  # op code
                 ("flags", c_uint8),  # fused operation
                 ("cid", c_uint16),  # command id
@@ -303,12 +304,14 @@ class nvme_admin_command(Structure):
 
 class nvme_identify_controller_amzn_vs(Structure):
     _pack_ = 1
+    _layout_ = 'ms'
     _fields_ = [("bdev", c_char * 32),  # block device name
                 ("reserved0", c_char * (1024 - 32))]
 
 
 class nvme_identify_controller_psd(Structure):
     _pack_ = 1
+    _layout_ = 'ms'
     _fields_ = [("mp", c_uint16),  # maximum power
                 ("reserved0", c_uint16),
                 ("enlat", c_uint32),  # entry latency
@@ -322,6 +325,7 @@ class nvme_identify_controller_psd(Structure):
 
 class nvme_identify_controller(Structure):
     _pack_ = 1
+    _layout_ = 'ms'
     _fields_ = [("vid", c_uint16),  # PCI Vendor ID
                 ("ssvid", c_uint16),  # PCI Subsystem Vendor ID
                 ("sn", c_char * 20),  # Serial Number
@@ -361,11 +365,18 @@ class nvme_identify_controller(Structure):
 class cBlockDevMap(object):
     def __init__(self, module, **kwds):
         self.module = module
+        self.debug = {'v': {}, 'vv': {}, 'vvv': {}, 'vvvv': {}}
+        self._verbosity = getattr(module, '_verbosity', 0)
         self.device_map = self.get_lsblk()
 
     def get_lsblk(self):
-        # Get all existing block volumes by key=value, then parse this into a dictionary (which excludes non disk and partition block types, e.g. ram, loop).  Cannot use the --json output as it not supported on older versions of lsblk (e.g. CentOS 7)
+        # Run partprobe to update block device partitions
+        partprobe_output = subprocess.check_output(['partprobe', '-s']).decode().rstrip().split('\n')
+        self.debug['v'].update({'partprobe': partprobe_output})
+
+        # Get all existing block volumes by key=value, then parse this into a dictionary
         lsblk_devices = subprocess.check_output(['lsblk', '-o', 'NAME,TYPE,UUID,FSTYPE,MOUNTPOINT,MODEL,SERIAL,SIZE,HCTL', '-p', '-P', '-b']).decode().rstrip().split('\n')
+        self.debug['vvv'].update({'lsblk_devices': lsblk_devices})
         os_device_names = [dict((map(lambda x: x.strip("\"").rstrip(), sub.split("="))) for sub in dev.split('\" ') if '=' in sub) for dev in lsblk_devices]
         os_device_names = [dev for dev in os_device_names if dev['TYPE'] in ['disk', 'part', 'lvm']]
 
@@ -382,6 +393,9 @@ class cBlockDevMap(object):
             os_device.update({"parttable_type": ""})
             udevadm_output_lines = subprocess.check_output(['udevadm', 'info', '--query=property', '--name', os_device['device_name_os']]).decode().rstrip().split('\n')
             udevadm_output = dict(s.split('=', 1) for s in udevadm_output_lines)
+
+            self.debug['vvvv'].setdefault('udevadm_output', {})[os_device['NAME']] = udevadm_output
+
             if 'ID_PART_TABLE_TYPE' in udevadm_output:
                 os_device.update({"parttable_type": udevadm_output['ID_PART_TABLE_TYPE']})
             if 'SERIAL' not in os_device or os_device['SERIAL']=='':
@@ -390,7 +404,6 @@ class cBlockDevMap(object):
                 elif 'ID_SERIAL' in udevadm_output:
                     os_device.update({"SERIAL": udevadm_output['ID_SERIAL']})
         return os_device_names
-
 
 class cLsblkMapper(cBlockDevMap):
     def __init__(self, **kwds):
@@ -505,6 +518,7 @@ def main():
         class cDummyAnsibleModule:  # For testing without Ansible (e.g. on Windows)
             def __init__(self):
                 self.params = {}
+                self._verbosity = 0
 
             def exit_json(self, changed, **kwargs):
                 print(changed, json.dumps(kwargs, sort_keys=True, indent=4, separators=(',', ': ')))
@@ -515,6 +529,12 @@ def main():
 
         module = cDummyAnsibleModule()
         module.params = {"cloud_type": sys.argv[2]}
+
+        # e.g. python blockdevmap.py console aws vvv
+        if len(sys.argv) > 3:
+            arg = sys.argv[3].strip().lower()
+            if arg and all(c == 'v' for c in arg):
+                module._verbosity = len(arg)
 
     if module.params['cloud_type'] == 'aws':
         blockdevmap = cAwsMapper(module=module)
@@ -529,7 +549,20 @@ def main():
     else:
         module.fail_json(msg="cloud_type not valid :" + module.params['cloud_type'])
 
-    module.exit_json(changed=False, device_map=blockdevmap.device_map)
+    result = {'changed': False, 'device_map': blockdevmap.device_map}
+
+    verbosity = getattr(blockdevmap, '_verbosity', 0)
+
+    if verbosity >= 1:
+        debug = {}
+        for i in range(1, verbosity + 1):
+            key = 'v' * i
+            if key in blockdevmap.debug and blockdevmap.debug[key]:
+                debug[key] = blockdevmap.debug[key]
+        if debug:
+            result['debug'] = debug
+
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':
